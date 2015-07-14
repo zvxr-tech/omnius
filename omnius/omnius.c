@@ -160,94 +160,27 @@ omnius_write(blob_t *blob) {
     return ret;
 }
 
-
-/* DO NOT USE  YET
- * This will output numeric encoding (according to a simple schema) of omnius statistics, that can be
- * easilly parsed by programs like awk to generate custom views of the stats omnius reports.
- *
- *
- * FORMAT
- * ------
- * pid, FS
- * total_mem_size, FS
- * mem_usage, FS
- * policy_count, FS
- *   regex, FS
- *   usage (refcount), FS
- *      ...
- *  (memory)
- *      used/free, FS
- *      start, FS
- *      finish, FS
- *      size, FS
- *      policy, FS
- *      policy_state, RS
- *      ...
- * RS
- *
- *
- */
-int
-omnius_view(blob_t *blob) {
-    int ret = EXIT_FAILURE;
-    size_t len = 0;
-
-
-    /* find the proc based on pid */
-    secmem_process_t *proc = g_pid_lookup[blob->head.pid];
-    void *buffer_p = blob->body.data; /* use the entire blob area */
-    /* validate */
-    if (proc) {
-        /* pid, mem_size */
-        len += snprintf(blob->body.data + len, MAX_BLOB_DATA_SIZE - len, "%d%c%zu%c", proc->pid, FS, (size_t) proc->mem_size, FS);
-
-        /* policies */
-        len += snprintf(blob->body.data + len, MAX_BLOB_DATA_SIZE - len, "%zu%c%", (size_t) proc->fsm_count, FS);
-        for (int i = 0; i < proc->fsm_count; i++, buffer_p = blob + len)
-            len += snprintf(blob->body.data + len, MAX_BLOB_DATA_SIZE - len, "%s%c%zu%c", proc->fsm_desc[i].comment, FS,
-                            (size_t) proc->fsm_desc->ref_count), FS;
-        /* memory */
-        secmem_obj_t *head = proc->secmem_head;
-        while (head) {
-            len += snprintf(blob->body.data + len, MAX_BLOB_DATA_SIZE - len, "%d%c%zu%c%zu%c%zu%c%s%c%zu%c",
-                            head->used, FS,
-                            (size_t) head->offset, FS,
-                            (size_t) (head->offset + head->size - 1), FS,
-                            (size_t) head->size, head->ragasm.fsm_desc->comment, FS,
-                            (size_t) head->ragasm.curr_state), RS;
-            head = head->next;
-        }
-        len += snprintf(blob->body.data + len, MAX_BLOB_DATA_SIZE - len, "%c", RS);
-    }
-    if (len > 0)
-        ret = EXIT_SUCCESS;
-    return ret;
-}
-
 /*
  * This will print statistics about omnius to stdout.
  */
 int
 omnius_view_internal(blob_t *blob) {
     int ret = EXIT_FAILURE;
-    size_t len = 0;
-
 
     /* find the proc based on pid */
     secmem_process_t *proc = g_pid_lookup[blob->head.pid];
-    void *buffer_p = blob->body.data; /* use the entire blob area */
     /* validate */
     if (proc) {
         /* pid, mem_size */
         printf("PID:\t%d\n\tTotal Size: 0x%x\n", proc->pid, proc->mem_size);
-        for (int i = 0; i < proc->fsm_count; i++, buffer_p = blob + len)
-            printf("\tPolicy: %d\n\t\tRegex: %s\n\t\tRef Count: %zu\n", i, proc->fsm_desc[i].comment, proc->fsm_desc[i].ref_count);
+        for (int i = 0; i < proc->fsm_count; i++)
+            printf("\tPolicy: %d\n\t\tRegex: %s\n\t\tRef Count: %zu\n", i, proc->fsm_desc[i].comment, (size_t) proc->fsm_desc[i].ref_count);
         /* memory */
         printf("\tMemory:\n\tstart\tend\tsize\tused\tregex\tstate\n");
         secmem_obj_t *head = proc->secmem_head;
         while(head) {
             printf("\t0x%x\t0x%x\t0x%x\t", head->offset, head->offset + head->size - 1, head->size);
-            printf("%c\t%s\t%zu\n", head->used ? 'X' : ' ', (head->ragasm.fsm_desc && head->ragasm.fsm_desc->comment)? head->ragasm.fsm_desc->comment : "" , head->ragasm.curr_state);
+            printf("%c\t%s\t%zu\n", head->used ? 'X' : ' ', (head->ragasm.fsm_desc && head->ragasm.fsm_desc->comment)? head->ragasm.fsm_desc->comment : "" , (size_t) head->ragasm.curr_state);
             head = head->next;
         }
         printf("\n");

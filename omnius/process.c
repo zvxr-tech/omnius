@@ -96,8 +96,6 @@ process_unload_fsm(secmem_process_t *proc)
 int
 process_load(blob_t *blob, secmem_process_t *proc)
 {
-    int i,k;
-    policy_t policy;
     int ret = EXIT_FAILURE;
 
     /* allocate the entire region of secure memory for this process */
@@ -227,7 +225,6 @@ int
 process_read(blob_t *blob, secmem_process_t *proc )
 {
     int ret = EXIT_FAILURE;
-    size_t len = 0;
 
     /*  get a reference to the memory object */
     secmem_obj_t *node;

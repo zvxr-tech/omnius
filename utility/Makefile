@@ -4,4 +4,4 @@ clr_msg: clr_msg.c
 	gcc -Wall -c -o $@ $<
 
 clean:
-	rm *.o clr_msg
+	rm -f *.o clr_msg

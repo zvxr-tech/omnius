@@ -312,51 +312,6 @@ scan_mtype_test(blob_t *blob)
 
 }
 
-/* TODO WIP - for future use when omnius replies to view commands with a print buffer stuffed in the blob data field
- * Currently, view command causes omnius to print to it's own stdin, and transmits a simple ack response with no data
- */
-void
-print_view(msgbuf_t msgbuf) {
-    pid_t pid, used;
-    size_t policy_count, mem_size, ref_count, offset_start, offset_end, size, curr_state;
-    char comment[MAX_FSM_COMMENT_LEN];
-    void *buffer_p  = msgbuf.blob.body.data;
-
-    /* pid, mem_size */
-    buffer_p += sscanf(buffer_p, "%d%zu", pid, mem_size);
-    printf("PID:\t%d\nTotal Mem:\t%zu\n", pid, mem_size);
-
-    /* policies */
-    buffer_p += sscanf(buffer_p, "%zu", policy_count);
-    for (int i = 0; i < policy_count; i++) {
-        buffer_p += sscanf(buffer_p, "%sFS%zuFS", comment, ref_count);
-        printf("Policy:\t%d\nRegex:\t%s\nRef Count:\t%zu\n", i, comment, ref_count);
-    }
-
-    printf("used\tstart\tend\tsize\tregex\tstate\n");
-    size_t len = 0;
-    do { /* we are guaranteed at least one memory node */
-        //buffer_p += sscanf(buffer_p, "%dFS%zuFS%zuFS%zuFS%sFS%zuRS\"",
-        buffer_p += sscanf(buffer_p, "%d%zu%zu%zu%s%zu\"",
-                           &used,
-                           &offset_start,
-                           &offset_end,
-                           &size,
-                           comment,
-                           &curr_state);
-        printf("%d\t%zu\t%zu\t%zu\t%s\t%zu\n",
-               used,
-               offset_start,
-               offset_end,
-               size,
-               comment,
-               curr_state);
-        len += size;
-    } while (len < mem_size);
-    return;
-}
-
-
 /* Upon input from user through stdin, generate a message to send to omnius.
  * Upon send, listen for a reply and display the response.
  */
@@ -377,7 +332,6 @@ cli(int msgqid_in, int msgqid_out)
         msgbuf_t in_buf, out_buf;
         memset(&in_buf, 0, sizeof(msgbuf_t));
         memset(&out_buf, 0, sizeof(msgbuf_t));
-        size_t mtext_len = 0;
         int ret = EXIT_FAILURE;
         switch (*c)
         {
@@ -549,7 +503,6 @@ show_usage(int ret)
 int main(int argc, char ** argv)
 {
     int msg_in, msg_out, ret = EXIT_FAILURE;
-    key_t msg_in_key, msg_out_key;
 
     /* Parse cmd-args and setup globals */
     if (argc < 3) {

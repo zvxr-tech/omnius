@@ -27,7 +27,6 @@
 int
 fsm_descriptor_load(char *regex, size_t len, fsm_descriptor_t *fsm_desc)
 {
-    SYMBOL_T *alpha_map;
     int ret = EXIT_FAILURE;;
     fsm_desc->ref_count = 0;
 

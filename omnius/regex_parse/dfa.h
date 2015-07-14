@@ -125,8 +125,6 @@ public:
      * This routine is not responsible for freeing the jmp_tbl after this routine succeeds.
      */
     size_t construct_jmptbl(SYMBOL_T *alpha_map, STATE_T **jmp_tbl_p) {
-
-        STATE_T k;
         const int null_state = 0;
         const int entry_state = 1;
         STATE_T trans_table_sink_state = 0;
@@ -158,6 +156,7 @@ public:
 
         /* identify sink state and copy out the trans_table to the jmp table buffer */
         size_t j = 0;
+        STATE_T k = 0;
         for (map<transition, state>::const_iterator i = trans_table.begin(); i != trans_table.end(); ++i, ++k) {
             if (!(k / trans_table_symbol_count)) {
                 /* run during first set of states (=0) to map the input symbols to an internal, packed enumeration */

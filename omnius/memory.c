@@ -77,7 +77,7 @@ memory_unload(secmem_obj_t *head)
 int
 memory_alloc(SECMEM_INTERNAL_T size, fsm_descriptor_t *fsm_desc, secmem_obj_t **node_p, secmem_obj_t **head_p) {
     int ret = EXIT_FAILURE;
-    secmem_obj_t *new_node;
+    secmem_obj_t *new_node = NULL;
     secmem_obj_t *head = *head_p;
     while (head) {
         if (!head->used && size <= head->size) {
