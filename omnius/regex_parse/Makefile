@@ -4,4 +4,4 @@ regex_parse:
 	g++ -ansi -Wall -pedantic -O -c *.cpp
 
 clean:
-	rm *.o 
+	rm -f *.o

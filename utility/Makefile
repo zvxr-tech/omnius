@@ -1,2 +1,7 @@
-all: clr_msg.c
-	gcc -Wall -o clr_msg clr_msg.c
+all: clr_msg
+
+clr_msg: clr_msg.c
+	gcc -Wall -c -o $@ $<
+
+clean:
+	rm *.o clr_msg
