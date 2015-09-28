@@ -335,7 +335,7 @@ extern "C" int compile_regex(char *regex, SYMBOL_T *symbol_count, SYMBOL_T **alp
         return EXIT_FAILURE;
 
     DFA dfa = subset_construct(tree_to_nfa(n));
-    size_t count = 0;
+    SYMBOL_T count = 0;
     if ((*alpha_map_p = (SYMBOL_T *) calloc(MAX_SYMBOL, sizeof(SYMBOL_T)))) {
         SYMBOL_T *alpha_map = *alpha_map_p;
         memset(alpha_map, FSM_NULL_STATE, MAX_SYMBOL * sizeof(SYMBOL_T)); /* default map to null state */

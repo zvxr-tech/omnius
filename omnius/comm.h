@@ -95,7 +95,6 @@ typedef struct policy_body_t
 
 typedef struct policy_head_t
 {
-    SECMEM_INTERNAL_T symbol_count;
     SECMEM_INTERNAL_T len;
 } policy_head_t;
 

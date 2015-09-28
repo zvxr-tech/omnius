@@ -77,10 +77,10 @@ scan_mtype_load(blob_t *blob)
         printf("Policy #%d\n", i+1);
 
         /* Policy - symbol count */
-        printf("Symbol count for Number of policy (0 to return):");
-        while (fscanf(stdin, "%zu", (size_t *)&policy_entry->head.symbol_count) < 1) {;}
-        if (policy_entry->head.symbol_count == 0)
-            return EXIT_FAILURE; /* error */
+       // printf("Symbol count for Number of policy (0 to return):");
+       // while (fscanf(stdin, "%zu", (size_t *)&policy_entry->head.symbol_count) < 1) {;}
+        //if (policy_entry->head.symbol_count == 0)
+       //     return EXIT_FAILURE; /* error */
 
         /* Policy - regex string*/
         char regex[MAX_MTEXT_SIZE]; /* The regex can never be larger than this to transmit successfully */
@@ -278,7 +278,7 @@ scan_mtype_test(blob_t *blob)
     blob->head.size = 100;
     blob->head.policy_count = 1;
 
-    blob->body.policy_entry[0].head.symbol_count = 2;
+
     blob->body.policy_entry[0].head.len = 8;
     blob->body.policy_entry[0].body.regex[0] = '(';
     blob->body.policy_entry[0].body.regex[1] = 'R';

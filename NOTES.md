@@ -2,27 +2,30 @@ TODO
 ====
 GENERAL
 -------
-- create sub-project makefiles
 - MAYBE implement a zero'th policy that is always "(\0)*"
-
+- check that offsets into fields are calculated with offsetof OR correctly
+- create man pages
 
 OMNIUS
 ------
 - remove symbol count from communication, et al.
 - add memuse statistics to process struct and update it upon alloc/dealloc
 - should the msg queue be cleared on startup?
+- change sig handler to include error checks like in erasmus.c
+
 
 OMNIUS-CLI
 ----------
-
-
+- change sig handler to include error checks like in erasmus.c
 
 
 REGEX_PARSE
 -----------
 - put checks in to ensure that the FSM transition table generated has at most max(STATE) states before converting to a jmp table.
 
-
+SHIM
+----
+- put in some protection so that certain things can only happen once (maybe make static?)
 
 NOTES
 =====
