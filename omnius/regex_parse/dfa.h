@@ -124,7 +124,7 @@ public:
      *
      * This routine is not responsible for freeing the jmp_tbl after this routine succeeds.
      */
-    size_t construct_jmptbl(SYMBOL_T *alpha_map, STATE_T **jmp_tbl_p) {
+    SYMBOL_T construct_jmptbl(SYMBOL_T *alpha_map, STATE_T **jmp_tbl_p) {
         const int null_state = 0;
         const int entry_state = 1;
         STATE_T trans_table_sink_state = 0;
@@ -252,10 +252,11 @@ public:
 
 
 /* DEBUG */
-
+#ifdef DEBUG
         for (k = 0; k < jmp_tbl_size; ++k) {
             cout << "jmp_tbl[" << (k / jmp_tbl_symbol_count) << ", " << (k % jmp_tbl_symbol_count) << "] = " << (int) jmp_tbl[k] << endl;
         }
+#endif
 
         return jmp_tbl_symbol_count;
     }
