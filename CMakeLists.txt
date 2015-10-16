@@ -14,3 +14,8 @@ add_executable(shim omnius-shim/shim.c)
 add_executable(standalone_shim omnius-shim/standalone_shim.c )
 add_executable(erasmus omnius-shim/erasmus.c omnius-shim/policy.h)
 add_executable(udis86_test omnius-shim/udis86_test.c /usr/include/udis86.h)
+add_executable(xed_test omnius-shim/xed_test.c)
+add_executable(target omnius-shim/target.c)
+
+link_directories(/pin-2.14-71313-gcc.4.4.7-linux/extras/xed-intel64/include/)
+target_link_libraries(udis86_test udis86)
