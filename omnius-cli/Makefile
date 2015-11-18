@@ -1,7 +1,7 @@
 all: omnius-cli
 
 omnius-cli: ../omnius/comm.o omnius-cli.o
-	gcc -Wall -o $@ $<
+	gcc -Wall -o $@ ../omnius/comm.o omnius-cli.o
 
 omnius-cli.o: omnius-cli.c
 	gcc -Wall -c -o $@ $<

@@ -172,14 +172,14 @@ omnius_view_internal(blob_t *blob) {
     /* validate */
     if (proc) {
         /* pid, mem_size */
-        printf("PID:\t%d\n\tTotal Size: 0x%x\n", proc->pid, proc->mem_size);
+        printf("PID:\t%d\n\tTotal Size: 0x%lx\n", proc->pid, proc->mem_size);
         for (int i = 0; i < proc->fsm_count; i++)
             printf("\tPolicy: %d\n\t\tRegex: %s\n\t\tRef Count: %zu\n", i, proc->fsm_desc[i].comment, (size_t) proc->fsm_desc[i].ref_count);
         /* memory */
         printf("\tMemory:\n\tstart\tend\tsize\tused\tregex\tstate\n");
         secmem_obj_t *head = proc->secmem_head;
         while(head) {
-            printf("\t0x%x\t0x%x\t0x%x\t", head->offset, head->offset + head->size - 1, head->size);
+            printf("\t0x%lx\t0x%lx\t0x%lx\t", head->offset, head->offset + head->size - 1, head->size);
             printf("%c\t%s\t%zu\n", head->used ? 'X' : ' ', (head->ragasm.fsm_desc && head->ragasm.fsm_desc->comment)? head->ragasm.fsm_desc->comment : "" , (size_t) head->ragasm.curr_state);
             head = head->next;
         }
@@ -230,7 +230,7 @@ listen(int ipc_in, int ipc_out)
             continue;
         }
         humanize_blob(&msg_buf, log_buf, sizeof(log_buf));
-        fprintf(g_logfile, "%s", log_buf);
+        fprintf(g_logfile, "\n<<<REQUEST<<<\n%s\n<<<<<<<<<<<<<\n", log_buf);
 
         /*
          * Exit upon receipt of the termination message.
@@ -261,8 +261,9 @@ listen(int ipc_in, int ipc_out)
         } else {
             msg_buf.mtype |= MTYPE_MOD_NAK; /* set nak-reply type if request was invalid */
         }
+        
         humanize_blob(&msg_buf, log_buf, sizeof(log_buf));
-        fprintf(g_logfile, "%s", log_buf);
+	fprintf(g_logfile, "\n>>>>REPLY>>>>\n%s\n>>>>>>>>>>>>>\n", log_buf);
     }
     return ret;
 }
@@ -319,9 +320,6 @@ startup(char **argv, int *msg_in, int *msg_out)
 
     /* clear the pid lookup table, because we interpret null=0 as empty. */
     memset(g_pid_lookup, 0, sizeof(g_pid_lookup));
-
-    /* Clear the message queue */
-    /* TODO future...maybe... *if* it should */
 
     /*
      * Populate the message action dispatch table
@@ -399,8 +397,8 @@ main(int argc, char **argv) {
     /* Parse cmd-args and setup globals */
     if (argc < 3) {
         /* if these are set, startup() will not try and parse cmd args for in/out msgids */
-        msg_in = 0xdead1;
-        msg_out = 0xdead2;
+        msg_in = OMNIUS_DEFAULT_MSG_IN;
+        msg_out = OMNIUS_DEFAULT_MSG_OUT;
     }
 
     if ((ret = startup(argv, &msg_in, &msg_out)) == EXIT_SUCCESS) {

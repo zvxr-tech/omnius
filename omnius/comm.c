@@ -8,7 +8,6 @@
  * 2015 - Mike Clark
  */
 #include <stdio.h>
-#include <sys/msg.h>
 #include "comm.h"
 
 /*
@@ -23,38 +22,38 @@ humanize_blob(msgbuf_t *msg_buf, char *out, size_t out_size)
         /* REPLIES - strip off the ack/nak flag */
         switch (STRIP_MTYPE_MOD(msg_buf->mtype)) {
             case MTYPE_LOAD:
-                len = (size_t) snprintf(out, out_size, "\nLoading pid %d", msg_buf->blob.head.pid);
+                len = (size_t) snprintf(out, out_size, "Loaded pid %d\n", msg_buf->blob.head.pid);
                 break;
             case MTYPE_UNLOAD:
-                len = (size_t) snprintf(out, out_size, "\nUnloading pid %d", msg_buf->blob.head.pid);
+                len = (size_t) snprintf(out, out_size, "Unloaded pid %d\n", msg_buf->blob.head.pid);
                 break;
             case MTYPE_ALLOC:
-                len = (size_t) snprintf(out, out_size, "\nAllocating from pid %d address %x", msg_buf->blob.head.pid,
+                len = (size_t) snprintf(out, out_size, "Allocated from pid %d @ secmem address 0x%lx\n", msg_buf->blob.head.pid,
                                          msg_buf->blob.head.addr);
                 break;
             case MTYPE_DEALLOC:
-                len = (size_t) snprintf(out, out_size, "\nDeallocating from pid %d", msg_buf->blob.head.pid);
+                len = (size_t) snprintf(out, out_size, "Deallocated from pid %d\n", msg_buf->blob.head.pid);
                 break;
             case MTYPE_READ:
-                len = (size_t) snprintf(out, out_size, "\nReading from pid %d", msg_buf->blob.head.pid);
+                len = (size_t) snprintf(out, out_size, "Read from pid %d\n", msg_buf->blob.head.pid);
                 break;
             case MTYPE_WRITE:
-                len = (size_t) snprintf(out, out_size, "\nWriting to pid %d", msg_buf->blob.head.pid);
+                len = (size_t) snprintf(out, out_size, "Written to pid %d\n", msg_buf->blob.head.pid);
                 break;
             case MTYPE_VIEW:
-                len = (size_t) snprintf(out, out_size, "\nVIEW message pid %d", msg_buf->blob.head.pid);
+                len = (size_t) snprintf(out, out_size, "Viewed message pid %d\n", msg_buf->blob.head.pid);
                 break;
             case MTYPE_TERMINATE:
-                len = (size_t) snprintf(out, out_size, "\nTERMINATION message ");
+                len = (size_t) snprintf(out, out_size, "Terminated message\n");
                 break;
             case MTYPE_NIL:
-                len = (size_t) snprintf(out, out_size, "\nNIL message ");
+                len = (size_t) snprintf(out, out_size, "NIL message\n");
                 break;
             default:
-                len = (size_t) snprintf(out, out_size, "\nUNKNOWN message type (%d) ", (int) msg_buf->mtype);
+                len = (size_t) snprintf(out, out_size, "UNKNOWN message type (%d) ", (int) msg_buf->mtype);
                 break;
         }
-        snprintf(out + len, out_size - len, IS_ACK(msg_buf->mtype) ? "\tACK\n" : "\tNAK\n");
+        len += snprintf(out + len, out_size - len, (IS_ACK(msg_buf->mtype) ? "ACK\n" : "NAK\n"));
     } else {
         /* REQUESTS */
         switch (msg_buf->mtype) {
@@ -66,19 +65,19 @@ humanize_blob(msgbuf_t *msg_buf, char *out, size_t out_size)
                 len = (size_t) snprintf(out, out_size, "Unloading pid %d.\n", msg_buf->blob.head.pid);
                 break;
             case MTYPE_ALLOC:
-                len = (size_t) snprintf(out, out_size, "Allocating from pid %d, size %zu\n", msg_buf->blob.head.pid,
+                len = (size_t) snprintf(out, out_size, "Allocating %lx bytes from pid %d, size 0x%lx\n", msg_buf->blob.head.size, msg_buf->blob.head.pid,
                                (size_t) msg_buf->blob.head.size);
                 break;
             case MTYPE_DEALLOC:
-                len = (size_t) snprintf(out, out_size, "Deallocating from pid %d @ local offset %zu\n", msg_buf->blob.head.pid,
+                len = (size_t) snprintf(out, out_size, "Deallocating from pid %d @ secmem address 0x%lx\n", msg_buf->blob.head.pid,
                                (size_t) msg_buf->blob.head.addr);
                 break;
             case MTYPE_READ:
-                len = (size_t) snprintf(out, out_size, "Reading from pid %d @ local offset %zu\n", msg_buf->blob.head.pid,
+                len = (size_t) snprintf(out, out_size, "Reading %lx bytes from pid %d @ secmem addres 0x%lx\n", msg_buf->blob.head.data_len, msg_buf->blob.head.pid,
                                (size_t) msg_buf->blob.head.addr);
                 break;
             case MTYPE_WRITE:
-                len = (size_t) snprintf(out, out_size, "Writing to pid %d @ local offset %zu\n", msg_buf->blob.head.pid,
+                len = (size_t) snprintf(out, out_size, "Writing %lx bytes to pid %d @ secmem addres 0x%lx\n", msg_buf->blob.head.data_len, msg_buf->blob.head.pid,
                                (size_t) msg_buf->blob.head.addr);
                 break;
             case MTYPE_VIEW:
@@ -95,14 +94,16 @@ humanize_blob(msgbuf_t *msg_buf, char *out, size_t out_size)
                 break;
         }
     }
-    printf("DATA:\n");
+    
+    len += snprintf(out + len, out_size - len,"Data:\n");
     if (IS_MTYPE_VIEW_ACK(msg_buf->mtype)) {
         len = len; /* TODO finish implementing this: print_view(out_buf); */
     } else {
         char eol = '\t';
         size_t i;
         for (i = 0;  len <= out_size && i < msg_buf->blob.head.data_len; i++) {
-            len += snprintf(out + len, out_size - len,"%x%c", msg_buf->blob.body.data[i], eol);
+            unsigned int  holder = (unsigned int) msg_buf->blob.body.data[i];
+            len += snprintf(out + len, out_size - len,"%lx%c", holder, eol);
             eol = (char) ((((i + 1) % VIEW_DATA_ROW_WIDTH) == 0) ? '\n' : '\t');
         }
     }

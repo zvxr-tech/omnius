@@ -13,6 +13,7 @@
 
 #include <signal.h>
 #include <sys/types.h>
+#include <sys/msg.h>
 #include "global.h"
 
 /*
@@ -77,8 +78,6 @@
  * POLICY STUCTURES
  * This is a raw description of a policy.
  * It includes:
- *  -the count of symbols the regex uses (from the alphabet [0-255]). This includes the NULL symbol, which may not be
- *   explicitly used in the regex input during policy loading.
  *  -the length of the regular expression, and
  *  -the regular expression (ASCII encoded char sequence and unterminated).
  *      The regex is a format that can be understood by the ragasm compiler.
@@ -118,6 +117,44 @@ typedef struct policy_t
  * other members of that union (field), this minimizes the chance of errors parsing the message, however this is simply
  * an ad-hoc, POCish way to communicate with no regard to the safety or welfare of others. BE WARNED!
  *
+ * Blob Types
+ * 
+ * LOAD
+ * 	pid
+ * 	size
+ * 	policy_count
+ * 	data_len
+ * 	data (policy_t[])
+ * 
+ * UNLOAD
+ * 	pid
+ * 	
+ * ALLOC
+ * 	pid
+ * 	size
+ * 	policy_id
+ * 	
+ * FREE
+ * 	pid
+ * 	addr
+ * 
+ * READ
+ * 	pid
+ * 	addr
+ * 
+ * 	data_len
+ * 
+ * WRITE
+ *	pid
+ *	addr
+ * 
+ *	data	
+ * 	
+ * 	
+ * 	 	
+ * 
+ * 
+ * 
  */
 
 typedef struct blob_header_t {
