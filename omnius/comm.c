@@ -28,8 +28,10 @@ humanize_blob(msgbuf_t *msg_buf, char *out, size_t out_size)
                 len = (size_t) snprintf(out, out_size, "Unloaded pid %d\n", msg_buf->blob.head.pid);
                 break;
             case MTYPE_ALLOC:
-                len = (size_t) snprintf(out, out_size, "Allocated from pid %d @ secmem address 0x%lx\n", msg_buf->blob.head.pid,
-                                         msg_buf->blob.head.addr);
+                /* the semantics of this message change if memory allocation failed */
+		len = (size_t) snprintf(out, out_size, "Allocated from pid %d @ secmem %s 0x%lx\n", msg_buf->blob.head.pid,
+                                         IS_ACK(msg_buf->mtype) ? "address" : "size",
+                                         IS_ACK(msg_buf->mtype) ? msg_buf->blob.head.addr : msg_buf->blob.head.size);
                 break;
             case MTYPE_DEALLOC:
                 len = (size_t) snprintf(out, out_size, "Deallocated from pid %d\n", msg_buf->blob.head.pid);
@@ -103,7 +105,7 @@ humanize_blob(msgbuf_t *msg_buf, char *out, size_t out_size)
         size_t i;
         for (i = 0;  len <= out_size && i < msg_buf->blob.head.data_len; i++) {
             unsigned int  holder = (unsigned int) msg_buf->blob.body.data[i];
-            len += snprintf(out + len, out_size - len,"%lx%c", holder, eol);
+            len += snprintf(out + len, out_size - len,"%x%c", holder, eol);
             eol = (char) ((((i + 1) % VIEW_DATA_ROW_WIDTH) == 0) ? '\n' : '\t');
         }
     }

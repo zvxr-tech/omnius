@@ -53,7 +53,7 @@ scan_mtype_load(blob_t *blob)
 
     // Field 2 - mem_size
     printf("Total memory size (0 to return): 0x");
-    while (fscanf(stdin, "%x", &blob->head.size) < 1) {;}
+    while (fscanf(stdin, "%lx", &blob->head.size) < 1) {;}
     if (blob->head.size == 0)
         return EXIT_FAILURE; /* error */
 
@@ -146,7 +146,7 @@ scan_mtype_alloc(blob_t *blob)
 
     /*  Field 2 - size of memory object */
     printf("Memory size (0 to return): 0x");
-    while (fscanf(stdin, "%x", &blob->head.size) < 1) {;}
+    while (fscanf(stdin, "%lx", &blob->head.size) < 1) {;}
     if (blob->head.size == 0)
         return EXIT_FAILURE; /*  error */
 
@@ -174,7 +174,7 @@ scan_mtype_dealloc(blob_t *blob)
 
     /*  Field 2 - memory address */
     printf("Secure-Memory address ([ESC][ENTER] to return):");
-    while (fscanf(stdin, "%x", &blob->head.addr) < 1) {;}
+    while (fscanf(stdin, "%lx", &blob->head.addr) < 1) {;}
     if (blob->head.addr == ESC_CHAR)
         return EXIT_FAILURE; /*  error */
 
@@ -197,7 +197,7 @@ scan_mtype_read(blob_t *blob)
 
     /*  Field 2 - secmem address to read from */
     printf("Address to read from ([ESC][ENTER] to return): 0x");
-    while(fscanf(stdin, "%x", &blob->head.addr) < 1) {;}
+    while(fscanf(stdin, "%lx", &blob->head.addr) < 1) {;}
     if (blob->head.addr == ESC_CHAR)
         return EXIT_FAILURE; /* error */
 
@@ -206,7 +206,7 @@ scan_mtype_read(blob_t *blob)
 
     /*  Field 5 - How much data to read  */
     printf("Read length (Bytes) ([ESC][ENTER] to return): 0x");
-    while(fscanf(stdin, "%x", &blob->head.data_len) < 1) {;}
+    while(fscanf(stdin, "%lx", &blob->head.data_len) < 1) {;}
     if (blob->head.data_len == 0)
         return EXIT_FAILURE; /* error */
 
@@ -228,7 +228,7 @@ scan_mtype_write(blob_t *blob)
 
     /*  Field 2 - secmem address to write to */
     printf("Address to write to ([ESC][ENTER] to return): 0x");
-    while(fscanf(stdin, "%x", &blob->head.addr) < 1) {;}
+    while(fscanf(stdin, "%lx", &blob->head.addr) < 1) {;}
     if (blob->head.addr == ESC_CHAR)
         return EXIT_FAILURE; /* error */
 

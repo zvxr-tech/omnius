@@ -1,8 +1,9 @@
+DEBUG="-g"
 all: omnius
 
 omnius: regex_parse_dir
-	gcc  -g -Wall -O -c ./*.c
-	g++ -g -Wall -o omnius *.o regex_parse/*.o
+	gcc  $(DEBUG) -Wall -O -c ./*.c
+	g++ $(DEBUG) -Wall -o omnius *.o regex_parse/*.o
 regex_parse_dir:
 	export DEBUG
 	$(MAKE) -C regex_parse

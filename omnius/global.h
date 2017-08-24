@@ -34,7 +34,10 @@
 #define OMNIUS_DEFAULT_MSG_IN 0xdead1
 #define OMNIUS_DEFAULT_MSG_OUT 0xdead2
 
-#define FALSE 0
-#define TRUE 1
-
+#ifndef FALSE
+    #define FALSE 0
+#endif /* FALSE */
+#ifndef TRUE
+    #define TRUE 1
+#endif /* TRUE */
 #endif /* SECMEM_GLOBAL_H */

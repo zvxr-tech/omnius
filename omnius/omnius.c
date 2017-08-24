@@ -99,7 +99,7 @@ omnius_alloc(blob_t *blob) {
     secmem_process_t *proc = g_pid_lookup[blob->head.pid];
 
     /* validate and process*/
-    if (proc &&  blob->head.size >= 0 && blob->head.size < proc->mem_size && blob->head.policy_id < proc->fsm_count) {
+    if (proc &&  blob->head.size > 0 && blob->head.size <= proc->mem_size && blob->head.policy_id < proc->fsm_count) {
         /* assuming success, the process routine will stuff the allocation address into blob */
         ret = process_alloc(blob, proc);
     }
