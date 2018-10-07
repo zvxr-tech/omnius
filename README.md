@@ -26,7 +26,7 @@ Although omnius operates independently, it is intended to be deployed on an exte
 
 
 ## Mechanics
-To accomplish this you need TODO things.
+To accomplish this you need three things.
 
 1) A way to declare watched memory objects and a language to express policy about them.
 
